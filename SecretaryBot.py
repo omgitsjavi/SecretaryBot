@@ -1,8 +1,10 @@
+# Standard modules
 import random
 import time
 
 # SBot modules
 import calculator
+import users
 
 # Defines possible opening lines
 greetings = ["Well hi there.", "Hi!", "Welcome.", "A pleasure to see you again, sir.",
@@ -24,7 +26,7 @@ Don't bother checking the manual, it just has a picture of the command prompt wi
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 main_menu = """
 Main Menu:
-CALCULATOR
+CALCULATOR        USERS
 """
 
 
@@ -55,6 +57,11 @@ def get_time_of_day():
         the_time = " night"
     return day + the_time
 
+# Method used for on the spot testing, invoked by "test" at main menu
+def test():
+    set_output("The test function isn't set to anything at the moment.")
+
+
 # Initialize with opening greeting
 def init():
     """Sets the opening greeting with the current time of day."""
@@ -66,9 +73,9 @@ def init():
     set_output(main_menu)
     run = True
 
-init()
 
 # Main loop
+init()
 while run:
     print output
     command = raw_input("MENU> ")
@@ -104,12 +111,26 @@ Good luck! I'll always be here if you need me.""")
         print "Resetting memory banks..."
         time.sleep(0.5)
         init()
+        
     # Calculator
     elif command == "calc" or command == "calculator":
         calculator.calculator()
         print "\n", "Welcome back to the main menu."
         time.sleep(1)
         set_output(main_menu)
+
+    # User Management
+    elif command == "users":
+        users.user_management()
+        print "\n", "Welcome back to the main menu."
+        time.sleep(1)
+        set_output(main_menu)
+
+
+    # Custom debug test command
+    elif command == "test":
+        test()
+        
     # Error: failure to recognize command
     else:
         set_output(choose_from(command_errors).format(cmd = "\"" + command + "\""))
