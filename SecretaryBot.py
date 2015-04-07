@@ -26,7 +26,7 @@ Don't bother checking the manual, it just has a picture of the command prompt wi
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 main_menu = """
 Main Menu:
-CALCULATOR        USERS
+CALCULATOR
 """
 
 
@@ -71,6 +71,7 @@ def init():
     print output
     time.sleep(1.0)
     set_output(main_menu)
+    
     run = True
 
 
