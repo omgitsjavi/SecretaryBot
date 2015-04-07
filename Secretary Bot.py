@@ -22,6 +22,10 @@ No really, I punched in {cmd} like you told me to and that's what I got.\
 Don't bother checking the manual, it just has a picture of the command prompt with the word HELP typed in. Useless."]
 # Other stuff
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+main_menu = """
+Main Menu:
+CALCULATOR
+"""
 
 
 # Methods for convenience and elegance
@@ -53,10 +57,13 @@ def get_time_of_day():
 
 # Initialize with opening greeting
 def init():
-    """Sets the opening greeting with the current day and time of day."""
+    """Sets the opening greeting with the current time of day."""
     global run, output
-    set_output(choose_from(greetings) + " It's " + \
+    set_output('\n' + choose_from(greetings) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts))
+    print output
+    time.sleep(1.0)
+    set_output(main_menu)
     run = True
 
 init()
@@ -64,7 +71,7 @@ init()
 # Main loop
 while run:
     print output
-    command = raw_input("Menu> ")
+    command = raw_input("MENU> ")
 
 # Checks that text commands are properly lowercase, gives feedback if not
     if command.isalpha():
@@ -100,7 +107,9 @@ Good luck! I'll always be here if you need me.""")
     # Calculator
     elif command == "calc" or command == "calculator":
         calculator.calculator()
-        set_output("\nWelcome back to the main menu.")
+        print "\n", "Welcome back to the main menu."
+        time.sleep(1)
+        set_output(main_menu)
     # Error: failure to recognize command
     else:
         set_output(choose_from(command_errors).format(cmd = "\"" + command + "\""))
