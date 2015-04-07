@@ -7,10 +7,10 @@ import calculator
 import users
 
 # Defines possible opening lines
-greetings = ["Well hi there.", "Hi!", "Welcome.", "A pleasure to see you again, sir.",
+greetings = ["Well hi there, {user}.", "Hi, {user}!", "{user}. Welcome.", "A pleasure to see you again, {user}.",
              "HOW DARE YOU I HAVE A KNIFE--Oh wait it's just you. *Ahem*", "ALL HAIL THE MIGHTY HELIX.",
-             "Hey hey!", "Well hello there, handsome.", "Oh hey. You know you, uh, got a thing on your--never mind.",
-             "Oh! A moment sir, let me just finish getting this...ah, that's much better."]
+             "Hey hey!", "Well hello there, handsome.", "Oh, hey {user}. You know you, uh, got a thing on your--never mind.",
+             "Oh! Just a moment {user}, let me just finish getting this...ah, that's much better."]
 prompts = ["What can I do for you?", "What's up?", "What'll it be today?", "What'll it be this time?",
            "Can I help you?", "What now?", "You'll be wanting the massage about now, I expect.",
            "I'm afraid Barry is calling me back into the office, but how can I help?"]
@@ -62,13 +62,18 @@ def test():
     set_output("The test function isn't set to anything at the moment.")
 
 
-# Initialize with opening greeting
+# Initialize with opening greeting and active user
 def init():
     """Sets the opening greeting with the current time of day."""
     global run, output
-    set_output('\n' + choose_from(greetings) + " It's " + \
+    
+    # TODO: Get SBot to automatically load user profiles
+    current_user = "CURRENT USER"
+    
+    set_output('\n' + choose_from(greetings).format(user=current_user) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts))
     print output
+    
     time.sleep(1.0)
     set_output(main_menu)
     run = True
