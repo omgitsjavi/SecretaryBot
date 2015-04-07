@@ -1,6 +1,8 @@
 # Simple calculator module
 
-# init
+help_text = """Type in expressions normally and hit enter.
+You can use an underscore "_" to reference the last calculated result."""
+
 def calculator():
     output = "Welcome to the calculator. QUIT at any time."
     # Variable for last calculation result
@@ -13,13 +15,13 @@ def calculator():
         # QUIT to menu
         if entered == "quit":
             run = False
+            
         # HELP documentation
         elif entered == "help":
-            output = """Type in expressions normally and hit enter.
-You can use an underscore "_" to reference the last calculated result."""
+            output = help_text
 
-        # Evaluates the entered expression as if it were typed as Python code.
-        # Clunky and potentially dangerous, but it works.
+        # Evaluates the entered expression by parsing the string.
+        # Clunky with int and float typing, but it works.
         else:
             output = eval(entered)
             # Saves result to memory variable
