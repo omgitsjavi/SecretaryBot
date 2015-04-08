@@ -9,11 +9,14 @@ class User:
     def __init__(self, name=""):
         self.name = name
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.name
 
-    def set_name(self, new_name):
-        """Used when the user wants to change their profile name after creation."""
+    # Note the use of Properties. Just use [user].name = [new_name] to change.
+    @name.setter
+    def name(self, new_name):
+        """For when the user wants to change their name after creation."""
         self.name = new_name
 
     def create_new_user_file(self):

@@ -46,15 +46,18 @@ def get_time_of_day():
     day = days_of_the_week[current_time.tm_wday]
     # note that system time is 24h clock
     hour = current_time.tm_hour
-    # translate to morning/afternoon/evening/night
+    # translate to morning/afternoon/evening/night/early morning
     if hour >= 6 and hour < 12:
         the_time = " morning"
     elif hour >= 12 and hour < 18:
         the_time = " afternoon"
     elif hour >= 18 and hour < 20:
         the_time = " evening"
-    else:
+    elif hour >= 20:
         the_time = " night"
+    else:
+        the_time = "early "
+        return the_time + day
     return day + the_time
 
 # Method used for on the spot testing, invoked by "test" at main menu
@@ -116,6 +119,10 @@ Good luck! I'll always be here if you need me.""")
         print "Resetting memory banks..."
         time.sleep(0.5)
         init()
+
+    # Custom debug test command
+    elif command == "test":
+        test()
         
     # Calculator
     elif command == "calc" or command == "calculator":
@@ -130,11 +137,6 @@ Good luck! I'll always be here if you need me.""")
         print "\n", "Welcome back to the main menu."
         time.sleep(1)
         set_output(main_menu)
-
-
-    # Custom debug test command
-    elif command == "test":
-        test()
         
     # Error: failure to recognize command
     else:

@@ -1,4 +1,5 @@
 # Simple calculator module
+from __future__ import division
 
 help_text = """Type in expressions normally and hit enter.
 You can use an underscore "_" to reference the last calculated result."""
