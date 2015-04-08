@@ -1,6 +1,7 @@
 # Standard modules
 import random
 import time
+import json
 
 # SBot modules
 import calculator
@@ -15,7 +16,7 @@ prompts = ["What can I do for you?", "What's up?", "What'll it be today?", "What
            "Can I help you?", "What now?", "You'll be wanting the massage about now, I expect.",
            "I'm afraid Barry is calling me back into the office, but how can I help?"]
 
-# Command error feedback, the {cmd} fields get replaced with the relevant command via str.format()
+# Command error feedback, the {cmd} fields get replaced with the triggering command via str.format()
 command_errors = ["Man I wish I knew how to process {cmd}, but I'm pretty dumb right now. \n\
 Try again? Or you could ask for HELP.",
                   "Mm...no. {cmd} doesn't make any sense to me. You sure you don't need any HELP?",
@@ -28,7 +29,10 @@ main_menu = """
 Main Menu:
 CALCULATOR        USERS
 """
-
+# Indices for saving module-specific user data
+module_index = {'user' : 0,
+                'calc' : 1,
+                'notes' : 2}
 
 # Methods for convenience and elegance
 def choose_from(stuff):
@@ -62,7 +66,10 @@ def get_time_of_day():
 
 # Method used for on the spot testing, invoked by "test" at main menu
 def test():
-    set_output("The test function isn't set to anything at the moment.")
+    #set_output("The test function isn't set to anything at the moment.")
+    test_new_user = users.create_new_user("Test User", module_index)
+
+    return test_new_user[1]
 
 
 # Initialize with opening greeting and active user
@@ -120,9 +127,9 @@ Good luck! I'll always be here if you need me.""")
         time.sleep(0.5)
         init()
 
-    # Custom debug test command
+    # Test: custom debug command
     elif command == "test":
-        test()
+        output = test()
         
     # Calculator
     elif command == "calc" or command == "calculator":
