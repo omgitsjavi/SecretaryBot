@@ -30,17 +30,18 @@ main_menu = """
 Main Menu:
 CALCULATOR    USERS
 """
+main_menu_help = """\
+You new here, love? Don't sweat it, we were all there once.
+All you need to know is that all commands are in lowercase, and each module
+is called by name. When you're done just QUIT out.
 
+Good luck! I'll always be here if you need me."""
+                
 
 # Methods for convenience and elegance
 def choose_from(stuff):
     """Simple function for semi-randomizing text responses from a set list (defined above)."""
     return random.choice(stuff)
-
-def set_output(string):
-    """Does what it says on the tin, in place for future GUI integration."""
-    global output
-    output = string
 
 def get_time_of_day():
     """Returns time in the form of 'Monday afternoon', or 'Thursday morning'"""
@@ -64,7 +65,7 @@ def get_time_of_day():
 
 # Method used for on the spot testing, invoked by "test" at main menu
 def test():
-    #set_output("The test function isn't set to anything at the moment.")
+    #output = "The test function isn't set to anything at the moment."
     test_new_user = users.create_new_user("Test User", module_index)
     
     return test_new_user[1] + " User list: " + str(user_list)
@@ -114,80 +115,80 @@ Names are case-sensitive and can be changed later."""
     else:
         print "ERROR LOADING USER PROFILES"
     
-    set_output('\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
-         get_time_of_day() + ". " + choose_from(prompts))
+    output = '\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
+         get_time_of_day() + ". " + choose_from(prompts)
     print output
     
     time.sleep(1.0)
-    set_output(main_menu)
     
+    output = main_menu
     run = True
 
 
-# Main loop
+# Main menu commands
+def SBot_quit():
+    global run
+    print "Bye bye!"
+    time.sleep(1)
+    run = False
+def SBot_help():
+    global output
+    output = main_menu_help
+def restart():
+    print "Resetting memory banks..."
+    time.sleep(0.5)
+    init()
+def run_module(module, *args):
+    global output
+    print "\n"
+    result = module(*args)
+    print "\n", "Returning to the main menu..."
+    time.sleep(1)
+    output = main_menu
+    return result
+def calc():
+    run_module(calculator.calculator)
+def user_management():
+    global output
+    requires_restart = run_module(users.user_management, active_user)
+    if requires_restart:
+        print "You've made some changes to your profile. Restarting SBot..."
+        time.sleep(2)
+        print "\n"
+        init()
+    
+menu_options = {'quit': SBot_quit,
+                'help': SBot_help,
+                'restart': restart,
+                'calc': calc,
+                'users': user_management}
+
+
+### BEGIN PROGRAM ###
+    
 init()
+
+# Main menu
 while run:
     print output
     command = raw_input("MENU> ")
 
-# Checks that text commands are properly lowercase, gives feedback if not
-    if command.isalpha():
+    # Command interpretation
+    if command in menu_options:
+        menu_options[command]()
+
+    # If command fails due to casing, give feedback
+    elif command.isalpha():
         if command.istitle():
-            set_output("Sorry love, it's casuals only in here. Use lowercase commands next time.")
+            output = "Sorry love, it's casuals only in here. Use lowercase commands next time."
             continue
         elif command.isupper():
-            set_output("That other guy give you wrong directions again? See, ya gotta keep \
-your commands lowercase.")
+            output = "That other guy give you wrong directions again? See, ya gotta keep \
+your commands lowercase."
             continue
-
-    # Command interpretation
-    # Help
-    if command == 'help':
-        set_output("""\
-You new here, love? Don't sweat it, we were all there once.
-All you need to know is that all commands are in lowercase, and each module
-is called by name. When you're done just QUIT out.
-
-Good luck! I'll always be here if you need me.""")
-        continue
-    # Quit
-    if command == "quit":
-        set_output("Bye bye!")
-        print output
-        time.sleep(1.0)
-        run = False
-    # Restart: goes back to opening greeting
-    elif command == "restart":
-        print "Resetting memory banks..."
-        time.sleep(0.5)
-        init()
-
-    # Test: custom debug command
-    elif command == "test":
-        output = test()
-        
-    # Calculator
-    elif command == "calc" or command == "calculator":
-        calculator.calculator()
-        print "\n", "Welcome back to the main menu."
-        time.sleep(1)
-        set_output(main_menu)
-
-    # User Management
-    elif command == "users":
-        print "\n"
-        requires_restart = users.user_management(active_user)
-        if requires_restart:
-            print "You've made some changes to your profile. Restarting SBot..."
-            time.sleep(2)
-            print "\n"
-            init()
         else:
-            print "\n", "Welcome back to the main menu."
-            time.sleep(1)
-            set_output(main_menu)
-        
-    # Error: failure to recognize command
+            output = choose_from(command_errors).format(cmd = "\"" + command + "\"")
+    # Else give standard error
     else:
-        set_output(choose_from(command_errors).format(cmd = "\"" + command + "\""))
+        output = choose_from(command_errors).format(cmd = "\"" + command + "\"")
         

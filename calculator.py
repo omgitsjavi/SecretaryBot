@@ -10,12 +10,12 @@ def calculator():
     _ = None
     run = True
     while run:
-        print "\n", output
+        print output
         entered = raw_input('CALC> ')
 
         # QUIT to menu
         if entered == "quit":
-            run = False
+            break
             
         # HELP documentation
         elif entered == "help":
@@ -24,7 +24,6 @@ def calculator():
         # Evaluates the entered expression by parsing the string.
         # Clunky with int and float typing, but it works.
         else:
-            output = eval(entered)
+            output = "\n" + str(eval(entered))
             # Saves result to memory variable
             _ = output
-
