@@ -59,8 +59,8 @@ def init_user(user_file):
 def user_management(active_user):
     """User management module. Returns True if an operation requires a restart."""
     
-    output = "Welcome to User Management, {user}. QUIT at any time.".format(user=active_user.name) +\
-"\nCHANGE NAME    NEW USER"
+    output = "Welcome to User Management, {user}.".format(user=active_user.name) +\
+"\nCHANGE NAME    NEW USER    QUIT to main menu"
     run = True
 
     while run:

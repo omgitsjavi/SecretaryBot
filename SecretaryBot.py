@@ -28,10 +28,9 @@ Don't bother checking the manual, it just has a picture of the command prompt wi
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 main_menu = """
 Main Menu:
-CALCULATOR
+CALCULATOR    USERS
 """
 
-#module_index = ['user', 'calc', 'notes']
 
 # Methods for convenience and elegance
 def choose_from(stuff):
@@ -176,6 +175,7 @@ Good luck! I'll always be here if you need me.""")
 
     # User Management
     elif command == "users":
+        print "\n"
         requires_restart = users.user_management(active_user)
         if requires_restart:
             print "You've made some changes to your profile. Restarting SBot..."
@@ -184,7 +184,7 @@ Good luck! I'll always be here if you need me.""")
             init()
         else:
             print "\n", "Welcome back to the main menu."
-            time.sleep
+            time.sleep(1)
             set_output(main_menu)
         
     # Error: failure to recognize command
