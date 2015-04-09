@@ -1,21 +1,23 @@
 # Standard modules
 import random
 import time
+import os
+import json
 
 # SBot modules
 import calculator
 import users
 
 # Defines possible opening lines
-greetings = ["Well hi there.", "Hi!", "Welcome.", "A pleasure to see you again, sir.",
+greetings = ["Well hi there, {user}.", "Hi, {user}!", "{user}. Welcome.", "A pleasure to see you again, {user}.",
              "HOW DARE YOU I HAVE A KNIFE--Oh wait it's just you. *Ahem*", "ALL HAIL THE MIGHTY HELIX.",
-             "Hey hey!", "Well hello there, handsome.", "Oh hey. You know you, uh, got a thing on your--never mind.",
-             "Oh! A moment sir, let me just finish getting this...ah, that's much better."]
+             "Hey hey!", "Well hello there, handsome.", "Oh, hey {user}. You know you, uh, got a thing on your--never mind.",
+             "Oh! Just a moment {user}, let me just finish getting this...ah, that's much better."]
 prompts = ["What can I do for you?", "What's up?", "What'll it be today?", "What'll it be this time?",
            "Can I help you?", "What now?", "You'll be wanting the massage about now, I expect.",
            "I'm afraid Barry is calling me back into the office, but how can I help?"]
 
-# Command error feedback, the {cmd} fields get replaced with the relevant command via str.format()
+# Command error feedback, the {cmd} fields get replaced with the triggering command via str.format()
 command_errors = ["Man I wish I knew how to process {cmd}, but I'm pretty dumb right now. \n\
 Try again? Or you could ask for HELP.",
                   "Mm...no. {cmd} doesn't make any sense to me. You sure you don't need any HELP?",
@@ -29,6 +31,7 @@ Main Menu:
 CALCULATOR
 """
 
+#module_index = ['user', 'calc', 'notes']
 
 # Methods for convenience and elegance
 def choose_from(stuff):
@@ -46,29 +49,76 @@ def get_time_of_day():
     day = days_of_the_week[current_time.tm_wday]
     # note that system time is 24h clock
     hour = current_time.tm_hour
-    # translate to morning/afternoon/evening/night
+    # translate to morning/afternoon/evening/night/early morning
     if hour >= 6 and hour < 12:
         the_time = " morning"
     elif hour >= 12 and hour < 18:
         the_time = " afternoon"
     elif hour >= 18 and hour < 20:
         the_time = " evening"
-    else:
+    elif hour >= 20:
         the_time = " night"
+    else:
+        the_time = "early "
+        return the_time + day
     return day + the_time
 
 # Method used for on the spot testing, invoked by "test" at main menu
 def test():
-    set_output("The test function isn't set to anything at the moment.")
+    #set_output("The test function isn't set to anything at the moment.")
+    test_new_user = users.create_new_user("Test User", module_index)
+    
+    return test_new_user[1] + " User list: " + str(user_list)
 
 
-# Initialize with opening greeting
+# Initialize with opening greeting and active user
 def init():
-    """Sets the opening greeting with the current time of day."""
-    global run, output
-    set_output('\n' + choose_from(greetings) + " It's " + \
+    """Sets the opening greeting, loads user profiles."""
+    global run, output, user_list, active_user
+    
+    # Locate user profiles
+    user_list = []
+    for file in os.listdir(os.curdir):
+        if file.endswith(".txt"):
+            user_list.append(file)
+
+    number_of_users = len(user_list)
+    
+    # If no profile present, prompt for profile creation
+    if number_of_users == 0:
+        print """SBot welcomes you. To begin, please choose a username.
+Names are case-sensitive and can be changed later."""
+        new_user_name = raw_input('Name> ')
+        user_creation = users.create_new_user(new_user_name)
+        active_user = user_creation[0]
+        print user_creation[1]
+        time.sleep(1)
+
+    # If there is exactly one user profile, load it
+    elif number_of_users == 1:
+        active_user = users.init_user(user_list[0])
+        print "User profile loaded: " + active_user.name
+        time.sleep(0.5)
+
+    # If mutiple profiles, prompt selection
+    elif number_of_users > 1:
+        print "Multiple profiles found. Who are you?"
+        # Print the list of user files, excluding .txt
+        for user in user_list:
+            print user_list.index(user) + 1, user[:-3]
+        selection = input('Choose a number> ') - 1
+        active_user = users.init_user(user_list[selection])
+
+        print "User profile loaded: " + active_user.name
+        time.sleep(0.5)
+        
+    else:
+        print "ERROR LOADING USER PROFILES"
+    
+    set_output('\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts))
     print output
+    
     time.sleep(1.0)
     set_output(main_menu)
     
@@ -112,6 +162,10 @@ Good luck! I'll always be here if you need me.""")
         print "Resetting memory banks..."
         time.sleep(0.5)
         init()
+
+    # Test: custom debug command
+    elif command == "test":
+        output = test()
         
     # Calculator
     elif command == "calc" or command == "calculator":
@@ -122,15 +176,16 @@ Good luck! I'll always be here if you need me.""")
 
     # User Management
     elif command == "users":
-        users.user_management()
-        print "\n", "Welcome back to the main menu."
-        time.sleep(1)
-        set_output(main_menu)
-
-
-    # Custom debug test command
-    elif command == "test":
-        test()
+        requires_restart = users.user_management(active_user)
+        if requires_restart:
+            print "You've made some changes to your profile. Restarting SBot..."
+            time.sleep(2)
+            print "\n"
+            init()
+        else:
+            print "\n", "Welcome back to the main menu."
+            time.sleep
+            set_output(main_menu)
         
     # Error: failure to recognize command
     else:
