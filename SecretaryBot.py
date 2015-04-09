@@ -1,6 +1,7 @@
 # Standard modules
 import random
 import time
+import os
 import json
 
 # SBot modules
@@ -29,10 +30,8 @@ main_menu = """
 Main Menu:
 CALCULATOR        USERS
 """
-# Indices for saving module-specific user data
-module_index = {'user' : 0,
-                'calc' : 1,
-                'notes' : 2}
+
+#module_index = ['user', 'calc', 'notes']
 
 # Methods for convenience and elegance
 def choose_from(stuff):
@@ -68,19 +67,55 @@ def get_time_of_day():
 def test():
     #set_output("The test function isn't set to anything at the moment.")
     test_new_user = users.create_new_user("Test User", module_index)
-
-    return test_new_user[1]
+    
+    return test_new_user[1] + " User list: " + str(user_list)
 
 
 # Initialize with opening greeting and active user
 def init():
-    """Sets the opening greeting with the current time of day."""
-    global run, output
+    """Sets the opening greeting, loads user profiles."""
+    global run, output, user_list, active_user
     
-    # TODO: Get SBot to automatically load user profiles
-    current_user = "CURRENT USER"
+    # Locate user profiles
+    user_list = []
+    for file in os.listdir(os.curdir):
+        if file.endswith(".txt"):
+            user_list.append(file)
+
+    number_of_users = len(user_list)
     
-    set_output('\n' + choose_from(greetings).format(user=current_user) + " It's " + \
+    # If no profile present, prompt for profile creation
+    if number_of_users == 0:
+        print """SBot welcomes you. To begin, please choose a username.
+Names are case-sensitive and can be changed later."""
+        new_user_name = raw_input('Name> ')
+        user_creation = users.create_new_user(new_user_name)
+        active_user = user_creation[0]
+        print user_creation[1]
+        time.sleep(1)
+
+    # If there is exactly one user profile, load it
+    elif number_of_users == 1:
+        active_user = users.init_user(user_list[0])
+        print "User profile loaded: " + active_user.name
+        time.sleep(0.5)
+
+    # If mutiple profiles, prompt selection
+    elif number_of_users > 1:
+        print "Multiple profiles found. Who are you?"
+        # Print the list of user files, excluding .txt
+        for user in user_list:
+            print user_list.index(user) + 1, user[:-3]
+        selection = input('Choose a number> ') - 1
+        active_user = users.init_user(user_list[selection])
+
+        print "User profile loaded: " + active_user.name
+        time.sleep(0.5)
+        
+    else:
+        print "ERROR LOADING USER PROFILES"
+    
+    set_output('\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts))
     print output
     
@@ -140,10 +175,16 @@ Good luck! I'll always be here if you need me.""")
 
     # User Management
     elif command == "users":
-        users.user_management()
-        print "\n", "Welcome back to the main menu."
-        time.sleep(1)
-        set_output(main_menu)
+        requires_restart = users.user_management(active_user)
+        if requires_restart:
+            print "You've made some changes to your profile. Restarting SBot..."
+            time.sleep(2)
+            print "\n"
+            init()
+        else:
+            print "\n", "Welcome back to the main menu."
+            time.sleep
+            set_output(main_menu)
         
     # Error: failure to recognize command
     else:
