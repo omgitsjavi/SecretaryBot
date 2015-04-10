@@ -7,6 +7,7 @@ import json
 # SBot modules
 import calculator
 import users
+import notes
 
 # Defines possible opening lines
 greetings = ["Well hi there, {user}.", "Hi, {user}!", "{user}. Welcome.", "A pleasure to see you again, {user}.",
@@ -28,14 +29,15 @@ Don't bother checking the manual, it just has a picture of the command prompt wi
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 main_menu = """
 Main Menu:
-CALCULATOR    USERS
+CALCULATOR    NOTES    USERS
 """
 main_menu_help = """\
 You new here, love? Don't sweat it, we were all there once.
 All you need to know is that all commands are in lowercase, and each module
 is called by name. When you're done just QUIT out.
 
-Good luck! I'll always be here if you need me."""
+You can always see this message again by typing HELP on the main menu (remember
+all commands are lowercase), and every other page has its own HELP information."""
                 
 
 # Methods for convenience and elegance
@@ -91,8 +93,13 @@ Names are case-sensitive and can be changed later."""
         new_user_name = raw_input('Name> ')
         user_creation = users.create_new_user(new_user_name)
         active_user = user_creation[0]
-        print user_creation[1]
-        time.sleep(1)
+        print user_creation[1], "\n"
+        time.sleep(2)
+        print main_menu_help
+        time.sleep(3)
+        output = main_menu
+        run = True
+        return 1
 
     # If there is exactly one user profile, load it
     elif number_of_users == 1:
@@ -115,9 +122,8 @@ Names are case-sensitive and can be changed later."""
     else:
         print "ERROR LOADING USER PROFILES"
     
-    output = '\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
+    print '\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts)
-    print output
     
     time.sleep(1.0)
     
@@ -146,7 +152,7 @@ def run_module(module, *args):
     time.sleep(1)
     output = main_menu
     return result
-def calc():
+def calc_module():
     run_module(calculator.calculator)
 def user_management():
     global output
@@ -156,12 +162,15 @@ def user_management():
         time.sleep(2)
         print "\n"
         init()
+def notes_module():
+    run_module(notes.notes, active_user)
     
 menu_options = {'quit': SBot_quit,
                 'help': SBot_help,
                 'restart': restart,
-                'calc': calc,
-                'users': user_management}
+                'calc': calc_module,
+                'users': user_management,
+                'notes': notes_module}
 
 
 ### BEGIN PROGRAM ###
