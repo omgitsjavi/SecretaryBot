@@ -149,7 +149,7 @@ def run_module(module, *args):
     print "\n"
     result = module(*args)
     print "\n", "Returning to the main menu..."
-    time.sleep(1)
+    time.sleep(0.75)
     output = main_menu
     return result
 def calc_module():
@@ -169,6 +169,7 @@ menu_options = {'quit': SBot_quit,
                 'help': SBot_help,
                 'restart': restart,
                 'calc': calc_module,
+                'calculator': calc_module,
                 'users': user_management,
                 'notes': notes_module}
 
