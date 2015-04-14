@@ -7,4 +7,4 @@ SBot can be run as a standalone .exe (located in the "dist" folder) without havi
 Please note that, due to the way user profiles are created and loaded, you'll want to run SBot in a self-contained folder.
 
 Modules currently available:
-Calculator | User Management
+User Management | Calculator | Notes
