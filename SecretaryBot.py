@@ -8,6 +8,7 @@ import json
 import calculator
 import users
 import notes
+import todo
 
 # Defines possible opening lines
 greetings = ["Well hi there, {user}.", "Hi, {user}!", "{user}. Welcome.", "A pleasure to see you again, {user}.",
@@ -29,7 +30,7 @@ Don't bother checking the manual, it just has a picture of the command prompt wi
 days_of_the_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 main_menu = """
 Main Menu:
-CALCULATOR    NOTES    USERS
+CALCULATOR | NOTES | TODO | USERS | QUIT
 """
 main_menu_help = """\
 You new here, love? Don't sweat it, we were all there once.
@@ -164,6 +165,8 @@ def user_management():
         init()
 def notes_module():
     run_module(notes.notes, active_user)
+def todo_module():
+    run_module(todo.todo, active_user)
     
 menu_options = {'quit': SBot_quit,
                 'help': SBot_help,
@@ -171,7 +174,8 @@ menu_options = {'quit': SBot_quit,
                 'calc': calc_module,
                 'calculator': calc_module,
                 'users': user_management,
-                'notes': notes_module}
+                'notes': notes_module,
+                'todo': todo_module}
 
 
 ### BEGIN PROGRAM ###

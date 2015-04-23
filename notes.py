@@ -14,10 +14,10 @@ def init_notes_data():
         user_data['notes'] = {}
         json.dump(user_data, file)
     sleep(0.5)
-    print "Done!\n"
+    print "Done!"
     sleep(0.5)
     # Include welcome message and help info to new user
-    print "Welcome to Notes!", '\n', help_text, '\n'
+    print "\n", "Welcome to Notes!", '\n', help_text, '\n'
     sleep(2.0)
 
 def load_user(active_user):
