@@ -1,13 +1,17 @@
 # Simple calculator module
+# This import statement makes calc handle int division properly
 from __future__ import division
 
-help_text = """Type in expressions normally and hit enter.
-You can use an underscore "_" to reference the last calculated result."""
+help_text = """A pretty basic arithmetic calculator.
+Use +, -, *, /, ** (for exponents), and parenthesis.
+Type in expressions normally and hit enter, or QUIT at any time.
+You can use an underscore "_" to reference the last calculated result.
+"""
 
 def calculator():
     output = "Welcome to the calculator. QUIT at any time."
     # Variable for last calculation result
-    _ = None
+    _ = 0
     run = True
     while run:
         print output
@@ -20,10 +24,19 @@ def calculator():
         # HELP documentation
         elif entered == "help":
             output = help_text
+            print
 
         # Evaluates the entered expression by parsing the string.
-        # Clunky with int and float typing, but it works.
+        # Note that eval() isn't totally safe, as it'll run interpreter
+        # functions like help() and quit()
         else:
-            output = "\n" + str(eval(entered))
-            # Saves result to memory variable
-            _ = output
+            try:
+                result = eval(entered)
+            except (NameError, SyntaxError):
+                output = "Can't make sense of that one. Try again!\n"
+            except ZeroDivisionError:
+                output = "Trying to divide by zero! Can't have that, now can we?\n"
+            else:
+                # Saves result to memory variable
+                _ = result
+                output = "\n" + str(result)

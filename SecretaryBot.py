@@ -5,6 +5,7 @@ import os
 import json
 
 # SBot modules
+from sbot_exceptions import *
 import calculator
 import users
 import notes
@@ -62,6 +63,7 @@ def get_time_of_day():
     elif hour >= 20:
         the_time = " night"
     else:
+        # If it's past midnight but before morning, it's "early [day]"
         the_time = "early "
         return the_time + day
     return day + the_time
@@ -81,12 +83,20 @@ def init():
     
     # Locate user profiles
     user_list = []
-    for file in os.listdir(os.curdir):
-        if file.endswith(".txt"):
-            user_list.append(file)
+    for os_file in os.listdir(os.curdir):
+        if os_file.endswith(".txt"):
+            try:
+                with open(os_file, 'r') as file:
+                    user_data = json.load(file)
+                name = user_data['user']['name']
+            # Handles if either the file can't be loaded or the data is invalid
+            except (ValueError, KeyError):
+                print LoadUserError(os_file)
+            else:
+                user_list.append(os_file)
 
-    number_of_users = len(user_list)
-    
+    print
+    number_of_users = len(user_list) 
     # If no profile present, prompt for profile creation
     if number_of_users == 0:
         print """SBot welcomes you. To begin, please choose a username.
@@ -112,6 +122,7 @@ Names are case-sensitive and can be changed later."""
     elif number_of_users > 1:
         print "Multiple profiles found. Who are you?"
         # Print the list of user files, excluding .txt
+        # Note the +1 and -1 for human vs computer counting
         for user in user_list:
             print user_list.index(user) + 1, user[:-3]
         selection = input('Choose a number> ') - 1
@@ -122,7 +133,8 @@ Names are case-sensitive and can be changed later."""
         
     else:
         print "ERROR LOADING USER PROFILES"
-    
+
+    # Print greeting for returning user
     print '\n' + choose_from(greetings).format(user=active_user.name) + " It's " + \
          get_time_of_day() + ". " + choose_from(prompts)
     
@@ -179,30 +191,18 @@ menu_options = {'quit': SBot_quit,
 
 
 ### BEGIN PROGRAM ###
-    
+# Start up...
 init()
-
 # Main menu
 while run:
     print output
     command = raw_input("MENU> ")
-
     # Command interpretation
-    if command in menu_options:
-        menu_options[command]()
-
-    # If command fails due to casing, give feedback
-    elif command.isalpha():
-        if command.istitle():
-            output = "Sorry love, it's casuals only in here. Use lowercase commands next time."
-            continue
-        elif command.isupper():
-            output = "That other guy give you wrong directions again? See, ya gotta keep \
-your commands lowercase."
-            continue
+    try:
+        if command in menu_options:
+            menu_options[command]()
         else:
-            output = choose_from(command_errors).format(cmd = "\"" + command + "\"")
-    # Else give standard error
-    else:
-        output = choose_from(command_errors).format(cmd = "\"" + command + "\"")
+            raise CommandError(command)
+    except CommandError as error:
+        print error
         

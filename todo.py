@@ -3,6 +3,7 @@
 import random
 from time import sleep
 import json
+from sbot_exceptions import *
 
 help_text = """This module keeps track of organized lists. Each list is saved
 separately and editable line by line. To manage each list, open it by entering
@@ -75,7 +76,11 @@ def read_line(nested_list, line_index):
     """Traverse nested list to obtain the line at given line_address."""
     result = nested_list[:]
     for index in line_index:
-        result = result[index]
+        # Conditional for catching index errors
+        if type(result) == type([]):
+            result = result[index]
+        else:
+            raise IndexError
     # Accounts for if request is the first line in a sublist
     if type(result) == type([]):
         result = result[0]
@@ -192,10 +197,15 @@ def remove_line(list_name, line_number):
     """Removes line specified by line_number."""
     edited_list = user_data['todo'][list_name]
     line_index = parse_line_number(line_number)
-    edited_list = remove_line_at_address(edited_list, line_index)
-    with open(user_file, 'w') as file:
-        user_data['todo'][list_name] = edited_list
-        json.dump(user_data, file)
+    try:
+        print read_line(edited_list, line_index)
+    except IndexError:
+        raise NestedListIndexError(line_number)
+    else:
+        edited_list = remove_line_at_address(edited_list, line_index)
+        with open(user_file, 'w') as file:
+            user_data['todo'][list_name] = edited_list
+            json.dump(user_data, file)
 
 def insert_line_at_address(nested_list, line_index, new_line):
     """Returns modified list with new_line inserted below specified line_index.
@@ -221,10 +231,14 @@ def insert_line_at_address(nested_list, line_index, new_line):
 
 def insert_line(list_name, line_number):
     """Insert line beneath specified line_number."""
-    print "Inserting a line beneath " + line_number + "..."
-    new_line = raw_input('Line Contents> ')
     edited_list = user_data['todo'][list_name]
     line_index = parse_line_number(line_number)
+    try:
+        read_line(edited_list, line_index)
+    except IndexError:
+        raise NestedListIndexError(line_number)
+    print "Inserting a line beneath " + line_number + "..."
+    new_line = raw_input('Line Contents> ')
     edited_list = insert_line_at_address(edited_list, line_index, new_line)
     with open(user_file, 'w') as file:
         user_data['todo'][list_name] = edited_list
@@ -252,6 +266,10 @@ def edit_line_at_index(nested_list, line_index, new_line):
 def edit_line(list_name, line_number):
     """Changes line at specified line_number."""
     line_index = parse_line_number(line_number)
+    try:
+        read_line(user_data['todo'][list_name], line_index)
+    except IndexError:
+        raise NestedListIndexError(line_number)
     old_line = read_line(user_data['todo'][list_name], line_index)
     print "Editing:", old_line
     new_line = raw_input(line_number + '> ')
@@ -311,22 +329,31 @@ def open_list(list_name):
     global list_opened
     list_opened = True
     while list_opened:
-        print list_name + ":"
+        print "\n", list_name + ":"
         print parse_list(user_data['todo'][list_name])
         print list_menu
         command = raw_input('LIST> ')
+        print
         # Note that the INSERT, DELETE, and EDIT commands must separate out line number
         if "delete " in command:
-            remove_line(list_name, command[7:])
+            try:
+                remove_line(list_name, command[7:])
+            except NestedListIndexError as error:
+                print error
         elif "insert " in command:
-            insert_line(list_name, command[7:])
+            try:
+                insert_line(list_name, command[7:])
+            except NestedListIndexError as error:
+                print error
         elif "edit " in command:
-            edit_line(list_name, command[5:])
+            try:
+                edit_line(list_name, command[5:])
+            except NestedListIndexError as error:
+                print error
         elif command in list_options:
             list_options[command](list_name)
         else:
-            print "Command not recognized."
-        print
+            print CommandError(command)
 
 
 # Module loop
@@ -337,7 +364,7 @@ def todo(active_user):
     
     while run:
         for list_name in user_data['todo']:
-            print list_name + "   "
+            print "[" + list_name + "]"
         print module_menu
 
         entered = raw_input('TODO> ')
@@ -347,7 +374,7 @@ def todo(active_user):
             print
             menu_options[entered]()
         else:
-            print "Command not recognized.", "\n"
+            print CommandError(entered), "\n"
             
 
 

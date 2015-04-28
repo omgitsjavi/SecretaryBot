@@ -1,6 +1,7 @@
 """Notes module, used by user for storing miscellaneous bits of information."""
 import json
 from time import sleep
+from sbot_exceptions import *
 
 help_text = """The Notes module saves any piece of information you might want to 
 recall later. Each note is saved with a label and can be edited freely.
@@ -138,6 +139,8 @@ def open_note(note_name):
         command = raw_input('NOTE> ')
         if command in note_options:
             note_options[command](note_name)
+        else:
+            print CommandError(command)
         print
 
 
@@ -161,12 +164,13 @@ NEW NOTE | DELETE ALL NOTES | QUIT to Main Menu"""
         print output
         # Command interpretation
         entered = raw_input('NOTES> ')
+        print
         # Checks for note title
         if entered.title() in user_data['notes']:
-            print
             open_note(entered.title())
         # Checks for menu command
-        if entered in menu_options:
-            print
+        elif entered in menu_options:
             menu_options[entered]()
+        else:
+            print CommandError(command)
 
