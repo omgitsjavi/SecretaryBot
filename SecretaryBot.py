@@ -162,7 +162,7 @@ def run_module(module, *args):
     print "\n"
     result = module(*args)
     print "\n", "Returning to the main menu..."
-    time.sleep(0.75)
+    time.sleep(0.35)
     output = main_menu
     return result
 def calc_module():
