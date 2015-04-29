@@ -6,6 +6,7 @@ Data is stored in the format [[Username, ...],[...]]
 import json
 from os import rename
 from time import sleep
+from sbot_exceptions import *
 
 help_text = """Currently an empty WIP, soon you'll be able to CHANGE NAME.
 Future options may include the ability to reset user data."""
@@ -95,7 +96,7 @@ def user_management(active_user):
             # Indicate need for program restart
             return True
 
-        # New user creation
+        # NEW USER creation
         elif entered == "new user":
             # Prompt for new user's name and create
             print "Choose a name! Names are case sensitive and can be changed later."
@@ -105,3 +106,7 @@ def user_management(active_user):
 
             # Indicate need for program restart
             return True
+
+        # Invalid input
+        else:
+            print CommandError(entered), "\n"

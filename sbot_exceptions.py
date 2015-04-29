@@ -29,10 +29,6 @@ class CommandError(SBotException):
         else:
             return choose_from(command_errors).format(cmd = "\"" + self.command + "\"")
 
-    @property
-    def command(self):
-        return self.command
-
 
 class LoadUserError(SBotException):
     """Handles failure to load a .txt file as a user file."""
