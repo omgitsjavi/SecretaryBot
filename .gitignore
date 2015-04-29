@@ -3,3 +3,9 @@ build\*
 build_dist.bat
 secretary bot.spec
 *.txt
+*.log
+*.toc
+*.pyz
+*.pkg
+*.manifest
+*.spec
